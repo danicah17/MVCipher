@@ -22,7 +22,7 @@ public class MVCipher {
 	}
 	
 	/**
-	 *	Method header goes here
+	 *	Runs the actual code and the methods
 	 */
 	public void run() {
 		System.out.println("\n Welcome to the MV Cipher machine!\n");
@@ -30,8 +30,10 @@ public class MVCipher {
 		String word = "";
 		
 		while (!done) {
+			/* Prompt for a key and change to uppercase
+		    Using the Prompt class to get user input */
 			word = Prompt.getString("Please input a word to use as key "+
-			"(letters only)");
+			"(letters only) ");
 			word = word.toUpperCase();
 			done = true;
 			if (word.length() < 3) {
@@ -48,77 +50,89 @@ public class MVCipher {
 				" and at least 3 characters long");
 			}
 		}
-	
-			/* Prompt for a key and change to uppercase
-		   Do not let the key contain anything but alpha
-		   Use the Prompt class to get user input */
 		
 		
 		/* Prompt for encrypt or decrypt */
+			System.out.println("");
 			int input = Prompt.getInt("Encrypt or decrypt?", 1, 2);
+			System.out.println("");
 			String inputFileName = "";
+			String outputFileName = "";
+			Scanner scanner = null;
+			PrintWriter writer = null;
 			if (input == 1) {
-				inputFileName = Prompt.getString("Name of file to encrypt");
+				/* Prompt for an input file name */
+				inputFileName = Prompt.getString("Name of file to encrypt ");
+				scanner = FileUtils.openToRead(inputFileName);
+				/* Prompt for an output file name */
+				outputFileName = Prompt.getString("Name of output file ");
+				writer = FileUtils.openToWrite(outputFileName);
+				System.out.println("");
+				System.out.println("The encrypted file " + outputFileName + 
+								" has been created " + 
+								"using the keyword -> " + word);
+				System.out.println("");
 			}
 			else if (input == 2) {
-				inputFileName = Prompt.getString("Name of file to decrypt");
-			}
-			String outputFileName = Prompt.getString("Name of output file");
-			
-		/* Prompt for an input file name */
-		
-		
-		/* Prompt for an output file name */
-		
-		
+				inputFileName = Prompt.getString("Name of file to decrypt ");
+				scanner = FileUtils.openToRead(inputFileName);
+				/* Prompt for an output file name */
+				outputFileName = Prompt.getString("Name of output file ");
+				writer = FileUtils.openToWrite(outputFileName);
+				System.out.println("");
+				System.out.println("The decrypted file " + outputFileName + 
+								" has been created " + 
+								"using the keyword -> " + word);
+				System.out.println("");				
+			}	
+	
 		/* Read input file, encrypt or decrypt, and print to output file */
-		Scanner scanner = FileUtils.openToRead(inputFileName);
-		PrintWriter writer = FileUtils.openToWrite(outputFileName);
 		if (input == 1) {
 			encrypt(scanner, writer, word);
 		}
 		else if (input == 2) {
 			decrypt(scanner, writer, word);
-		}
-		
-		/* Don't forget to close your output file */
+		}	
 	}
 	
-	// other methods go here
 	
 	/**
-	 *	Method header goes here
+	 *	Encrypts the entire input file and prints it to the output file
+	 * @param scanner, writer, word
 	 */
 	public void encrypt(Scanner scanner, PrintWriter writer, String word) {
 		int keyCounter = 0;
 		while (scanner.hasNext()) {
 			String line = scanner.nextLine();
 			for (int c = 0; c < line.length(); c++) {
-				char i = line.charAt(c);
-				char k = word.charAt(keyCounter);
-				int shift = k - 'A' + 1;
+				char inputChar = line.charAt(c);
+				char keyChar = word.charAt(keyCounter);
+				int shift = keyChar - 'A' + 1;
 				char offset = '?';
-				if ('a' <= i && i <='z') {
+				if ('a' <= inputChar && inputChar <='z') {
 					offset = 'a';
 				}
-				else if ('A' <= i && i <='Z') {
+				else if ('A' <= inputChar && inputChar <='Z') {
 					offset = 'A';
 				}
 				else {
-					writer.print(i);
+					writer.print(inputChar);
 				}
 				if (offset != '?') {
-					int n = i - offset;
-					int x = (n + shift) % 26;
-					char e = (char)(x + offset);
-					writer.print(e);
+					int origIndex = inputChar - offset;
+					int finalIndex = (origIndex + shift) % 26;
+					char finalChar = (char)(finalIndex + offset);
+					writer.print(finalChar);
 					keyCounter = (keyCounter + 1) % word.length();
 				}
 			}
 			writer.println();
 		}
 	}
-	
+	/**
+	 *	Decrypts the entire input file and prints it to the output file
+	 * @param scanner, writer, word
+	 */
 	public void decrypt(Scanner scanner, PrintWriter writer, String word) {
 		int keyCounter = 0;
 		while (scanner.hasNext()) {
@@ -126,22 +140,22 @@ public class MVCipher {
 			for (int c = 0; c < line.length(); c++) {
 				char inputChar = line.charAt(c);
 				char keyChar = word.charAt(keyCounter);
-				int shift = k - 'A' + 1;
+				int shift = keyChar - 'A' + 1;
 				char offset = '?';
-				if ('a' <= i && i <='z') {
+				if ('a' <= inputChar && inputChar <='z') {
 					offset = 'a';
 				}
-				else if ('A' <= i && i <='Z') {
+				else if ('A' <= inputChar && inputChar <='Z') {
 					offset = 'A';
 				}
 				else {
-					writer.print(i);
+					writer.print(inputChar);
 				}
 				if (offset != '?') {
-					int origIndex = i - offset;
-					int finalIndez = (n - shift + 26) % 26;
-					char finalChar = (char)(x + offset);
-					writer.print(e);
+					int origIndex = inputChar - offset;
+					int finalIndex = (origIndex - shift + 26) % 26;
+					char finalChar = (char)(finalIndex + offset);
+					writer.print(finalChar);
 					keyCounter = (keyCounter + 1) % word.length();
 				}
 			}
